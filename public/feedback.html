@@ -2,11 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Feedback Page</title>
+    <title>Feedback - Feedback System</title>
     <style>
       body {
         font-family: Arial, sans-serif;
-        background: linear-gradient(to right, #8360c3, #2ebf91);
+        background: linear-gradient(to right, #56ab2f, #a8e063);
         margin: 0;
         padding: 0;
         display: flex;
@@ -16,112 +16,94 @@
       }
       .container {
         background: white;
-        margin-top: 50px;
+        margin-top: 60px;
         padding: 30px;
         border-radius: 15px;
-        width: 500px;
+        width: 400px;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        text-align: center;
       }
       h2 {
-        text-align: center;
-        margin-bottom: 20px;
         color: #333;
       }
-      textarea,
-      input {
-        width: 100%;
-        padding: 10px;
+      textarea {
+        width: 90%;
+        height: 100px;
         margin: 10px 0;
+        padding: 10px;
+        border: 1px solid #ddd;
         border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 14px;
       }
       button {
-        width: 100%;
+        width: 95%;
         padding: 12px;
+        margin: 10px 0;
         border: none;
         border-radius: 8px;
-        background: #2ebf91;
+        background: #56ab2f;
         color: white;
         font-size: 16px;
         cursor: pointer;
       }
       button:hover {
-        background: #249d77;
+        background: #3d7f1f;
       }
-      #msg {
-        text-align: center;
-        margin-top: 15px;
-        font-weight: bold;
+      ul {
+        text-align: left;
+        margin-top: 20px;
+      }
+      li {
+        background: #f1f1f1;
+        margin: 5px 0;
+        padding: 8px;
+        border-radius: 5px;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <h2>Submit Your Feedback</h2>
-      <textarea
-        id="feedbackText"
-        rows="5"
-        placeholder="Enter your feedback..."
-      ></textarea>
-      <input
-        id="rating"
-        type="number"
-        min="1"
-        max="5"
-        placeholder="Rating (1-5)"
-      />
+      <h2>Submit Feedback</h2>
+      <textarea id="feedbackText" placeholder="Enter feedback..."></textarea><br />
       <button onclick="submitFeedback()">Submit</button>
-      <p id="msg"></p>
+      <p id="msg" style="color: green"></p>
+
+      <h2>All Feedback</h2>
+      <ul id="feedbackList"></ul>
     </div>
 
     <script>
       async function submitFeedback() {
-        const token = localStorage.getItem("token"); // 🔑 token saved after login
-        const email = localStorage.getItem("email");
-
-        if (!token) {
-          document.getElementById("msg").innerText = "⚠️ Please login first!";
-          return;
-        }
-
-        const feedback = document.getElementById("feedbackText").value.trim();
-        const rating = document.getElementById("rating").value;
-
-        if (!feedback || !rating) {
-          document.getElementById("msg").innerText =
-            "⚠️ Please enter feedback and rating!";
-          return;
-        }
-
-        try {
-          const res = await fetch("/feedback", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + token, // ✅ send token
-            },
-            body: JSON.stringify({ email, feedback, rating }),
-          });
-
-          const data = await res.json();
-          if (res.ok) {
-            document.getElementById("msg").style.color = "green";
-            document.getElementById("msg").innerText =
-              data.message || "✅ Feedback submitted!";
-            document.getElementById("feedbackText").value = "";
-            document.getElementById("rating").value = "";
-          } else {
-            document.getElementById("msg").style.color = "red";
-            document.getElementById("msg").innerText =
-              data.message || "❌ Unauthorized!";
-          }
-        } catch (err) {
-          document.getElementById("msg").style.color = "red";
-          document.getElementById("msg").innerText =
-            "❌ Error submitting feedback";
-        }
+        const feedback = document.getElementById("feedbackText").value;
+        const token = localStorage.getItem("token");
+        const res = await fetch("/feedback", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+          body: JSON.stringify({ feedback }),
+        });
+        const data = await res.json();
+        document.getElementById("msg").innerText = data.message;
+        loadFeedback();
       }
+
+      async function loadFeedback() {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/feedback", {
+          headers: { Authorization: token },
+        });
+        const data = await res.json();
+        const list = document.getElementById("feedbackList");
+        list.innerHTML = "";
+        data.forEach((f) => {
+          const li = document.createElement("li");
+          li.textContent = `${f.email}: ${f.feedback}`;
+          list.appendChild(li);
+        });
+      }
+
+      loadFeedback();
     </script>
   </body>
 </html>
