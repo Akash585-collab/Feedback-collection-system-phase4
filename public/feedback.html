@@ -13,11 +13,6 @@
         justify-content: center;
         align-items: flex-start;
         min-height: 100vh;
-        transition: background 0.5s, color 0.5s;
-      }
-      body.dark {
-        background: #121212;
-        color: #f1f1f1;
       }
       .container {
         background: white;
@@ -26,252 +21,107 @@
         border-radius: 15px;
         width: 500px;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        text-align: center;
-        transition: background 0.5s, color 0.5s;
-      }
-      body.dark .container {
-        background: #1e1e1e;
-        color: #f1f1f1;
       }
       h2 {
-        margin: 0;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
       }
-      textarea {
-        width: 90%;
+      textarea,
+      input {
+        width: 100%;
         padding: 10px;
         margin: 10px 0;
-        border: 1px solid #ddd;
         border-radius: 8px;
-        height: 80px;
+        border: 1px solid #ccc;
+        font-size: 14px;
       }
       button {
-        width: 95%;
+        width: 100%;
         padding: 12px;
-        margin: 10px 0;
         border: none;
         border-radius: 8px;
         background: #2ebf91;
         color: white;
         font-size: 16px;
         cursor: pointer;
-        transition: 0.3s;
       }
       button:hover {
-        background: #24976e;
+        background: #249d77;
       }
-      .logout-btn {
-        background: red;
-        padding: 6px 10px;
-        border-radius: 6px;
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 12px;
-      }
-      .logout-btn:hover {
-        background: darkred;
-      }
-      .feedback-list {
+      #msg {
+        text-align: center;
         margin-top: 15px;
-        text-align: left;
-        max-height: 250px;
-        overflow-y: auto;
-      }
-      .feedback-item {
-        background: #f9f9f9;
-        margin: 8px 0;
-        padding: 10px;
-        border-left: 4px solid #2ebf91;
-        border-radius: 6px;
-        font-size: 14px;
-        position: relative;
-        transition: background 0.3s;
-      }
-      body.dark .feedback-item {
-        background: #2a2a2a;
-      }
-      .feedback-time {
-        font-size: 11px;
-        color: gray;
-      }
-      .actions {
-        position: absolute;
-        top: 5px;
-        right: 10px;
-      }
-      .actions button {
-        width: auto;
-        padding: 4px 6px;
-        font-size: 11px;
-        margin-left: 4px;
-        background: #555;
-      }
-      .actions button:hover {
-        background: #333;
-      }
-      /* Dark Mode Toggle */
-      .theme-toggle {
-        margin-left: 10px;
-        cursor: pointer;
-        font-size: 14px;
-        padding: 5px 10px;
-        border-radius: 6px;
-        background: #eee;
-      }
-      body.dark .theme-toggle {
-        background: #333;
-        color: #f1f1f1;
-      }
-      /* Notifications */
-      .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 18px;
-        border-radius: 6px;
-        color: white;
-        font-size: 14px;
-        opacity: 0;
-        transform: translateY(-20px);
-        transition: all 0.5s ease;
-        z-index: 999;
-      }
-      .notification.show {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      .success {
-        background: #28a745;
-      }
-      .error {
-        background: #dc3545;
+        font-weight: bold;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <div
-        class="topbar"
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
-        <h2>Feedback Page</h2>
-        <div>
-          <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-          <button class="logout-btn" onclick="logout()">Logout</button>
-        </div>
-      </div>
-
-      <textarea id="feedback" placeholder="Write your feedback..."></textarea
-      ><br />
-      <button onclick="submitFeedback()">Submit Feedback</button>
-
-      <h3>All Feedbacks</h3>
-      <div class="feedback-list" id="fbList"></div>
+      <h2>Submit Your Feedback</h2>
+      <textarea
+        id="feedbackText"
+        rows="5"
+        placeholder="Enter your feedback..."
+      ></textarea>
+      <input
+        id="rating"
+        type="number"
+        min="1"
+        max="5"
+        placeholder="Rating (1-5)"
+      />
+      <button onclick="submitFeedback()">Submit</button>
+      <p id="msg"></p>
     </div>
 
-    <div id="notification" class="notification"></div>
-
     <script>
-      const token = localStorage.getItem("token");
-      const email = localStorage.getItem("email");
-
-      if (!token) {
-        window.location.href = "index.html"; // Redirect if not logged in
-      }
-
-      function showNotification(msg, type = "success") {
-        const box = document.getElementById("notification");
-        box.innerText = msg;
-        box.className = `notification ${type} show`;
-        setTimeout(() => {
-          box.className = "notification";
-        }, 2500);
-      }
-
       async function submitFeedback() {
-        const feedback = document.getElementById("feedback").value;
-        if (!feedback.trim())
-          return showNotification("Feedback cannot be empty", "error");
+        const token = localStorage.getItem("token"); // 🔑 token saved after login
+        const email = localStorage.getItem("email");
 
-        const res = await fetch("/feedback", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token,
-          },
-          body: JSON.stringify({ feedback }),
-        });
+        if (!token) {
+          document.getElementById("msg").innerText = "⚠️ Please login first!";
+          return;
+        }
 
-        const data = await res.json();
-        if (res.ok) {
-          showNotification(data.message, "success");
-          document.getElementById("feedback").value = "";
-          loadFeedbacks();
-        } else {
-          showNotification(data.message, "error");
+        const feedback = document.getElementById("feedbackText").value.trim();
+        const rating = document.getElementById("rating").value;
+
+        if (!feedback || !rating) {
+          document.getElementById("msg").innerText =
+            "⚠️ Please enter feedback and rating!";
+          return;
+        }
+
+        try {
+          const res = await fetch("/feedback", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token, // ✅ send token
+            },
+            body: JSON.stringify({ email, feedback, rating }),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            document.getElementById("msg").style.color = "green";
+            document.getElementById("msg").innerText =
+              data.message || "✅ Feedback submitted!";
+            document.getElementById("feedbackText").value = "";
+            document.getElementById("rating").value = "";
+          } else {
+            document.getElementById("msg").style.color = "red";
+            document.getElementById("msg").innerText =
+              data.message || "❌ Unauthorized!";
+          }
+        } catch (err) {
+          document.getElementById("msg").style.color = "red";
+          document.getElementById("msg").innerText =
+            "❌ Error submitting feedback";
         }
       }
-
-      async function loadFeedbacks() {
-        const res = await fetch("/feedback");
-        const data = await res.json();
-        const list = document.getElementById("fbList");
-        list.innerHTML = "";
-        data.forEach((f) => {
-          const div = document.createElement("div");
-          div.className = "feedback-item";
-          div.innerHTML = `
-            <strong>${f.email}</strong>: ${f.feedback}
-            <div class="feedback-time">Posted on: ${new Date().toLocaleString()}</div>
-          `;
-
-          // Only show Edit/Delete for own feedback
-          if (f.email === email) {
-            const actions = document.createElement("div");
-            actions.className = "actions";
-
-            const editBtn = document.createElement("button");
-            editBtn.innerText = "Edit";
-            editBtn.onclick = () => editFeedback(f.feedback);
-
-            const delBtn = document.createElement("button");
-            delBtn.innerText = "Delete";
-            delBtn.onclick = () => deleteFeedback(f.feedback);
-
-            actions.appendChild(editBtn);
-            actions.appendChild(delBtn);
-            div.appendChild(actions);
-          }
-
-          list.appendChild(div);
-        });
-      }
-
-      function editFeedback(oldText) {
-        document.getElementById("feedback").value = oldText;
-        showNotification("Editing feedback...", "success");
-      }
-
-      async function deleteFeedback(text) {
-        // For now, just simulate delete since we don’t have DB
-        showNotification("Feedback deleted (demo)", "error");
-      }
-
-      function logout() {
-        localStorage.removeItem("token");
-        localStorage.removeItem("email");
-        window.location.href = "index.html";
-      }
-
-      function toggleTheme() {
-        document.body.classList.toggle("dark");
-      }
-
-      loadFeedbacks();
     </script>
   </body>
 </html>
