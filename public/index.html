@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login - Feedback System</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #2193b0, #6dd5ed);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+      }
+      .container {
+        background: white;
+        margin-top: 60px;
+        padding: 30px;
+        border-radius: 15px;
+        width: 400px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        text-align: center;
+      }
+      h2 {
+        margin-bottom: 10px;
+        color: #333;
+      }
+      input {
+        width: 90%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      button {
+        width: 95%;
+        padding: 12px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 8px;
+        background: #2193b0;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #176d7a;
+      }
+      p {
+        font-size: 13px;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Register</h2>
+      <input id="regEmail" placeholder="Email" /><br />
+      <input id="regPass" type="password" placeholder="Password" /><br />
+      <button onclick="register()">Register</button>
+      <p id="regMsg" style="color: green"></p>
+
+      <h2>Login</h2>
+      <input id="logEmail" placeholder="Email" /><br />
+      <input id="logPass" type="password" placeholder="Password" /><br />
+      <button onclick="login()">Login</button>
+      <p id="logMsg" style="color: green"></p>
+    </div>
+
+    <script>
+      async function register() {
+        const email = document.getElementById("regEmail").value;
+        const password = document.getElementById("regPass").value;
+        const res = await fetch("/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        document.getElementById("regMsg").innerText = data.message;
+      }
+
+      async function login() {
+        const email = document.getElementById("logEmail").value;
+        const password = document.getElementById("logPass").value;
+        const res = await fetch("/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        document.getElementById("logMsg").innerText = data.message;
+
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("email", email);
+          window.location.href = "feedback.html";
+        }
+      }
+    </script>
+  </body>
+</html>
