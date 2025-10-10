@@ -1,4 +1,4 @@
-# 🗳️ Feedback Collection System
+#  Feedback Collection System
 
 ## 1. AIM
 The aim of the **Feedback Collection System** is to provide a simple and efficient platform where users can register, log in, and submit their valuable feedback about a service, website, or product.  
@@ -7,14 +7,14 @@ It helps organizations gather insights and improve the user experience through s
 ---
 
 ## 2. Features
-- 🔐 **User Authentication** – Register and login functionality with secure REST API.
-- 🗣️ **Feedback Submission** – Users can submit feedback easily after login.
-- 📋 **Feedback Management** – View all submitted feedback (for admin or demo mode).
-- 🎨 **Responsive UI** – Clean, modern, and mobile-friendly web interface.
-- ⚙️ **Node.js REST API** – Handles all backend operations efficiently.
-- 🚫 **Session-Free Design** – No session storage or debug messages visible.
-- 💾 **JSON-based Data Handling** – Data stored in backend structure (without database dependency).
-- 🚀 **Future-Ready Enhancements** – API structure supports MongoDB or SQL integration later.
+-  **User Authentication** – Register and login functionality with secure REST API.
+-  **Feedback Submission** – Users can submit feedback easily after login.
+-  **Feedback Management** – View all submitted feedback (for admin or demo mode).
+-  **Responsive UI** – Clean, modern, and mobile-friendly web interface.
+-  **Node.js REST API** – Handles all backend operations efficiently.
+-  **Session-Free Design** – No session storage or debug messages visible.
+-  **JSON-based Data Handling** – Data stored in backend structure (without database dependency).
+-  **Future-Ready Enhancements** – API structure supports MongoDB or SQL integration later.
 
 ---
 
@@ -36,7 +36,7 @@ It helps organizations gather insights and improve the user experience through s
 
 ---
 
-## 💡 How to Run
+##  How to Run
 1. Clone the repository:
    git clone https://github.com/Akash585-collab/Feedback-collection-system-phase4.git 
 
